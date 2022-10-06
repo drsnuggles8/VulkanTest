@@ -1,0 +1,38 @@
+# Binaries
+obj/
+**/cache/**
+Intermediates/
+Binaries
+__pycache__
+
+# Visual Studio files and folder
+.vs/
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+**.csproj
+**.nsight-gfxproj
+**.DotSettings
+**.user
+
+# CMake ignores
+**/cmake-build-debug
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/install_manifest.txt
+**/CMakeFiles/
+**/CTestTestfile.cmake
+**/Makefile
+**/*.cbp
+**/CMakeScripts
+**/compile_commands.json
+
+*.pch
+*.obj
+build/**/*
+
+# Don't upload vendor folder, except for the CMakeLists.txt
+!VulkanTest/vendor/
+VulkanTest/vendor/*
+!VulkanTest//vendor/CMakeLists.txt

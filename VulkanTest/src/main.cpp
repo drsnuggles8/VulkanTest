@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 #include <cstdlib>
 #include <vector>
@@ -12,6 +13,7 @@
 #include <cstdint>
 #include <limits>
 #include <algorithm>
+#include <filesystem>
 
 
 const uint32_t WIDTH = 1920;
@@ -54,7 +56,7 @@ struct QueueFamilyIndices
 	std::optional<uint32_t> graphicsFamily;
 	std::optional<uint32_t> presentFamily;
 
-	bool isComplete()
+	bool isComplete() const
 	{
 		return graphicsFamily.has_value() && presentFamily.has_value();
 	}
@@ -116,6 +118,7 @@ private:
 		createLogicalDevice();
 		createSwapChain();
 		createImageViews();
+		createGraphicsPipeline();
 	}
 
 	void mainLoop()
@@ -391,7 +394,14 @@ private:
 		}
 	}
 
-	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
+	void createGraphicsPipeline()
+	{
+		auto vertShaderCode = readFile("C:/Users/ole/source/repos/VulkanTest/VulkanTest/src/shaders/vert.spv");
+		auto fragShaderCode = readFile("C:/Users/ole/source/repos/VulkanTest/VulkanTest/src/shaders/frag.spv");
+		std::cout << "Current path is " << std::filesystem::current_path() << '\n';
+	}
+
+	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const
 	{
 		for (const auto& availableFormat : availableFormats)
 		{
@@ -404,7 +414,7 @@ private:
 		return availableFormats[0];
 	}
 
-	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
+	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const
 	{
 		for (const auto& availablePresentMode : availablePresentModes)
 		{
@@ -425,7 +435,8 @@ private:
 		}
 		else
 		{
-			int width, height;
+			int width;
+			int height;
 			glfwGetFramebufferSize(window, &width, &height);
 
 			VkExtent2D actualExtent = {
@@ -483,7 +494,7 @@ private:
 		return indices.isComplete() && extensionsSupported && swapChainAdequate;
 	}
 
-	bool checkDeviceExtensionSupport(VkPhysicalDevice device)
+	bool checkDeviceExtensionSupport(VkPhysicalDevice device) const
 	{
 		uint32_t extensionCount;
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -582,6 +593,24 @@ private:
 		}
 
 		return true;
+	}
+
+	static std::vector<char> readFile(const std::string& filename)
+	{
+		std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+		if (!file.is_open())
+		{
+			throw std::runtime_error("failed to open file!");
+		}
+
+		size_t fileSize = (size_t)file.tellg();
+		std::vector<char> buffer(fileSize);
+
+		file.seekg(0);
+		file.read(buffer.data(), fileSize);
+
+		file.close();
 	}
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
